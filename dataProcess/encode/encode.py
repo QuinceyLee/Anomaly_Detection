@@ -1,6 +1,16 @@
 import pandas as pd
+import os
+
+
 # from dataProcess.conn2csv import filed
-from utils.find_file import find_all_file_csv
+# from utils.find_file import find_all_file_csv
+def find_all_file_csv(fold):
+    for root, ds, fs in os.walk(fold):
+        for f in fs:
+            if not f.startswith('._'):
+                if f.endswith('.csv'):
+                    yield f
+
 
 input_names = ['ts',
                "id.orig_p",
