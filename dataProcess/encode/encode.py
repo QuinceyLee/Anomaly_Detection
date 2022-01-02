@@ -526,11 +526,11 @@ def save_encode_dir(file_fold, out_fold):
 
 
 def merge(fold):
-    with open('/Users/lee/PycharmProjects/pythonProject/new/test.csv', 'ab') as f:
+    with open('../../test/test.csv', 'ab') as f:
         for item in find_all_file_csv(fold):
             f.write(open(fold + '/' + item, 'rb').read())
 
 
 # collect_sample('/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/csv/sta')
 # save_encode_dir(data_csv, '/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/encode_5')
-merge('/Users/lee/PycharmProjects/pythonProject/new/test')
+merge('../../merge')
