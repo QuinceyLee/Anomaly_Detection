@@ -1,4 +1,5 @@
 import gc
+import sys
 
 import torch
 import torch.nn as nn
@@ -12,6 +13,7 @@ from cnn_model import CNN
 import pandas as pd
 import numpy as np
 from plot import get_confusion_matrix, plot_confusion_matrix
+from utils.Logger import Logger
 
 epochs = 10
 batch_size = 10000
@@ -26,9 +28,12 @@ def find_all_file(fold):
                 yield f
 
 
+sys.stdout = Logger('./out/result.log', sys.stdout)
+sys.stderr = Logger('./out/result.log_file', sys.stderr)
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 将训练数据装入Loader中
-filename = './new/test.csv'
+filename = './test.csv'
 train_dataset = MyDataset(filename, n_raws, shuffle=True)
 cnn = CNN()
 optimizer = torch.optim.Adam(cnn.parameters(), lr=learning_rate)  # optimize all cnn parameters
@@ -86,7 +91,7 @@ torch.save(cnn.state_dict(), './out/cnn.pkl')
 del train_dataset
 gc.collect()
 # test
-dt_test = pd.read_csv('./new/test.csv', header=None)
+dt_test = pd.read_csv('./test.csv', header=None)
 dt_test = scale(dt_test.values)
 x_test = dt_test[:, :-1].astype(float)
 add_zeros = np.zeros(len(x_test))

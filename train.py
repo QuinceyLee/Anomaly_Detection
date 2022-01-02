@@ -13,44 +13,44 @@ num_layers = 2
 num_classes = 8
 lr = 0.01  # learning rate
 
-train_loader = DataLoader(dataset=train_data,
-                          batch_size=batch_size,
-                          shuffle=True)  # 在每个epoch开始的时候，对数据重新打乱进行训练。在这里其实没啥用，因为只训练了一次
-
-test_loader = DataLoader(dataset=test_data,
-                         batch_size=batch_size,
-                         shuffle=False)
-
-model = LSTMnet(input_size, hidden_size, num_layers, num_classes)  # 10*10，lstm的每个隐藏层64个节点，2层隐藏层
-
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-criterion = nn.CrossEntropyLoss()
-
-# training and testing
-for epoch in range(epochs):
-    for iteration, (train_x, train_y) in enumerate(train_loader):  # train_x's shape (BATCH_SIZE,1,28,28)
-        train_x = train_x.squeeze()  # after squeeze, train_x's shape (BATCH_SIZE,28,28),
-        # 第一个28是序列长度，第二个28是序列中每个数据的长度。
-        output = model(train_x)
-        loss = criterion(output, train_y)  # cross entropy loss
-        optimizer.zero_grad()  # clear gradients for this training step
-        loss.backward()  # backpropagation, compute gradients
-        optimizer.step()  # apply gradients
-
-        if iteration % 100 == 0:
-            test_output = model(test_x)
-            predict_y = torch.max(test_output, 1)[1].numpy()
-            accuracy = float((predict_y == test_y.numpy()).astype(int).sum()) / float(test_y.size(0))
-            print('epoch:{:<2d} | iteration:{:<4d} | loss:{:<6.4f} | accuracy:{:<4.2f}'.format(epoch, iteration, loss,
-                                                                                               accuracy))
-
-# print 10 predictions from test data
-test_out = model(test_x[:10])
-pred_y = torch.max(test_out, dim=1)[1].data.numpy()
-print('The predict number is:')
-print(pred_y)
-print('The real number is:')
-print(test_y[:10].numpy())
+# train_loader = DataLoader(dataset=train_data,
+#                           batch_size=batch_size,
+#                           shuffle=True)  # 在每个epoch开始的时候，对数据重新打乱进行训练。在这里其实没啥用，因为只训练了一次
+#
+# test_loader = DataLoader(dataset=test_data,
+#                          batch_size=batch_size,
+#                          shuffle=False)
+#
+# model = LSTMnet(input_size, hidden_size, num_layers, num_classes)  # 10*10，lstm的每个隐藏层64个节点，2层隐藏层
+#
+# optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+# criterion = nn.CrossEntropyLoss()
+#
+# # training and testing
+# for epoch in range(epochs):
+#     for iteration, (train_x, train_y) in enumerate(train_loader):  # train_x's shape (BATCH_SIZE,1,28,28)
+#         train_x = train_x.squeeze()  # after squeeze, train_x's shape (BATCH_SIZE,28,28),
+#         # 第一个28是序列长度，第二个28是序列中每个数据的长度。
+#         output = model(train_x)
+#         loss = criterion(output, train_y)  # cross entropy loss
+#         optimizer.zero_grad()  # clear gradients for this training step
+#         loss.backward()  # backpropagation, compute gradients
+#         optimizer.step()  # apply gradients
+#
+#         if iteration % 100 == 0:
+#             test_output = model(test_x)
+#             predict_y = torch.max(test_output, 1)[1].numpy()
+#             accuracy = float((predict_y == test_y.numpy()).astype(int).sum()) / float(test_y.size(0))
+#             print('epoch:{:<2d} | iteration:{:<4d} | loss:{:<6.4f} | accuracy:{:<4.2f}'.format(epoch, iteration, loss,
+#                                                                                                accuracy))
+#
+# # print 10 predictions from test data
+# test_out = model(test_x[:10])
+# pred_y = torch.max(test_out, dim=1)[1].data.numpy()
+# print('The predict number is:')
+# print(pred_y)
+# print('The real number is:')
+# print(test_y[:10].numpy())
 
 # model = simple_lstm(input_size, hidden_size, num_layers, num_classes)
 #
