@@ -1,3 +1,8 @@
+import sys
+
+sys.path.append("../../dataProcess")
+sys.path.append("../../utils")
+
 import pandas as pd
 from dataProcess.conn2csv import filed
 from utils.find_file import find_all_file_csv
