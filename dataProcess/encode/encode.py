@@ -542,4 +542,4 @@ def merge(fold):
 
 # collect_sample('/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/csv/sta')
 # save_encode_dir(data_csv, '/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/encode_5')
-merge('../../merge')
+merge('/root/test/Anomaly_Detection/merge')
