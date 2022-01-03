@@ -20,6 +20,14 @@ batch_size = 10000
 learning_rate = 0.01
 n_raws = 5000000
 
+cpu_num = 8  # 这里设置成你想运行的CPU个数
+os.environ['OMP_NUM_THREADS'] = str(cpu_num)
+os.environ['OPENBLAS_NUM_THREADS'] = str(cpu_num)
+os.environ['MKL_NUM_THREADS'] = str(cpu_num)
+os.environ['VECLIB_MAXIMUM_THREADS'] = str(cpu_num)
+os.environ['NUMEXPR_NUM_THREADS'] = str(cpu_num)
+torch.set_num_threads(cpu_num)
+
 
 def find_all_file(fold):
     for root, ds, fs in os.walk(fold):
@@ -84,7 +92,7 @@ for _ in range(epochs):
             sklearn_precision,
             sklearn_recall,
             sklearn_f1))
-
+    torch.save(cnn.state_dict(), './out/cnn' + _ + '.pkl')
 # dt_train = pd.read_csv('./new/train.csv', header=None)
 torch.save(cnn.state_dict(), './out/cnn.pkl')
 
