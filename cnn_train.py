@@ -93,7 +93,7 @@ for _ in range(epochs):
             sklearn_f1))
     torch.save(cnn.state_dict(), './out/cnn' + _ + '.pkl')
 # dt_train = pd.read_csv('./new/train.csv', header=None)
-torch.save(cnn.state_dict(), './out/cnn.pkl')
+torch.save(cnn.state_dict(), 'out/cnn.pkl')
 
 del train_dataset
 gc.collect()

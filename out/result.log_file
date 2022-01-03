@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Users/lee/PycharmProjects/pythonProject/cnn_train_once.py", line 155, in <module>
+    cnn_train_once()
+  File "/Users/lee/PycharmProjects/pythonProject/cnn_train_once.py", line 119, in cnn_train_once
+    dt_test = pd.read_csv(test_folder + file_name, header=None)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/util/_decorators.py", line 311, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 586, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 482, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 811, in __init__
+    self._engine = self._make_engine(self.engine)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 1040, in _make_engine
+    return mapping[engine](self.f, **self.options)  # type: ignore[call-arg]
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/c_parser_wrapper.py", line 51, in __init__
+    self._open_handles(src, kwds)
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/parsers/base_parser.py", line 222, in _open_handles
+    self.handles = get_handle(
+  File "/Users/lee/Documents/Tools/anaconda/lib/python3.9/site-packages/pandas/io/common.py", line 702, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/lee/PycharmProjects/t21.csv'

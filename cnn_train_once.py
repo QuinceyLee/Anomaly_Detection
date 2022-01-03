@@ -1,5 +1,6 @@
 import gc
 import sys
+from random import shuffle
 
 import torch
 import torch.nn as nn
@@ -18,7 +19,7 @@ from utils.Logger import Logger
 def cnn_train_once():
     epochs = 10
     batch_size = 10000
-    learning_rate = 0.01
+    learning_rate = 0.001
 
     cpu_num = 8  # 这里设置成你想运行的CPU个数
     os.environ['OMP_NUM_THREADS'] = str(cpu_num)
@@ -44,13 +45,17 @@ def cnn_train_once():
     loss_func = nn.CrossEntropyLoss()
     print("开始训练主循环")
     cnn.train()
+    train_file_name = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv',
+                       '10.csv', '11.csv', '12.csv', '13.csv', '14.csv', '15.csv', '16.csv', '17.csv', '18.csv']
+    train_folder = '/root/test/Anomaly_Detection/train/'
     for number in range(epochs):
         tot_loss = 0.0
         tot_acc = 0.0
         train_pred = []
         train_trues = []
-        for file_name in find_all_file('/root/test/Anomaly_Detection/merge'):
-            dt_train = pd.read_csv('/root/test/Anomaly_Detection/merge/' + file_name, header=None)
+        shuffle(train_file_name)
+        for file_name in train_file_name:
+            dt_train = pd.read_csv(train_folder + file_name, header=None)
             dt_train = scale(dt_train.values)
             x_train = dt_train[:, :-1].astype(float)
             add_zeros = np.zeros(len(x_train))
@@ -90,7 +95,7 @@ def cnn_train_once():
             "precision:{:.4f} "
             "recall:{:.4f} "
             "f1:{:.4f}".format(
-                epochs,
+                number,
                 tot_loss,
                 sklearn_accuracy,
                 sklearn_precision,
@@ -103,28 +108,31 @@ def cnn_train_once():
     del train_dataset
     gc.collect()
     # test
-    dt_test = pd.read_csv('/root/test/Anomaly_Detection/merge/6.csv', header=None)
-    dt_test = scale(dt_test.values)
-    x_test = dt_test[:, :-1].astype(float)
-    add_zeros = np.zeros(len(x_test))
-    x_test = np.c_[x_test, add_zeros]
-    x_test = np.reshape(x_test, (len(x_test), 4, 4))
-    y_test = dt_test[:, -1].astype(int)
-    x_test, y_test = torch.FloatTensor(x_test), torch.LongTensor(y_test)
-    x_test = torch.unsqueeze(x_test, dim=1)
-    test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
-    test_loader = Data.DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8)
-
+    cnn = CNN()
+    cnn.load_state_dict(torch.load('./out/cnn.pkl'))
     test_pred = []
     test_trues = []
     cnn.eval()
-
+    test_file_name = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv']
+    test_folder = '/root/test/Anomaly_Detection/test/'
     with torch.no_grad():
-        for i, (train_data_batch, test_data_label) in enumerate(test_loader):
-            _, test_outputs = cnn(train_data_batch)
-            test_outputs = test_outputs.argmax(dim=1)
-            test_pred.extend(test_outputs.detach().cpu().numpy())
-            test_trues.extend(test_data_label.detach().cpu().numpy())
+        for file_name in test_file_name:
+            dt_test = pd.read_csv(test_folder + file_name, header=None)
+            dt_test = scale(dt_test.values)
+            x_test = dt_test[:, :-1].astype(float)
+            add_zeros = np.zeros(len(x_test))
+            x_test = np.c_[x_test, add_zeros]
+            x_test = np.reshape(x_test, (len(x_test), 4, 4))
+            y_test = dt_test[:, -1].astype(int)
+            x_test, y_test = torch.FloatTensor(x_test), torch.LongTensor(y_test)
+            x_test = torch.unsqueeze(x_test, dim=1)
+            test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
+            test_loader = Data.DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8)
+            for i, (train_data_batch, test_data_label) in enumerate(test_loader):
+                _, test_outputs = cnn(train_data_batch)
+                test_outputs = test_outputs.argmax(dim=1)
+                test_pred.extend(test_outputs.detach().cpu().numpy())
+                test_trues.extend(test_data_label.detach().cpu().numpy())
         sklearn_accuracy = accuracy_score(test_trues, test_pred)
         sklearn_precision = precision_score(test_trues, test_pred, average='micro')
         sklearn_recall = recall_score(test_trues, test_pred, average='micro')

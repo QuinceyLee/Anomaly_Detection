@@ -13,7 +13,10 @@ data_path = "./new/44-1.log.labeled.csv"
 batch_size = 5
 n_raws = 12
 epoch = 3
-train_dataset = MyDataset(data_path, n_raws, shuffle=False)
+
+
+# train_dataset = MyDataset(data_path, n_raws, shuffle=False)
+
 
 # def convert(data_in):
 #     result = None
@@ -44,8 +47,28 @@ train_dataset = MyDataset(data_path, n_raws, shuffle=False)
 # ]
 # res = convert(data)
 # print(type(res))
-sys.stdout = Logger('a.log', sys.stdout)
-sys.stderr = Logger('a.log_file', sys.stderr)
-df = pd.read_csv("./new/44-1.log.labeled.csv", header=None, usecols=[10, 11, 12, 13, 14])
-print('mean = ', np.mean(df))
-print('std = ', np.std(df))
+# sys.stdout = Logger('a.log', sys.stdout)
+# sys.stderr = Logger('a.log_file', sys.stderr)
+# df = pd.read_csv("./new/44-1.log.labeled.csv", header=None, usecols=[10, 11, 12, 13, 14])
+# print('mean = ', np.mean(df))
+# print('std = ', np.std(df))
+
+def split_csv():
+    with open('../new/train.csv', 'r') as f:
+        raws = 300000000
+        num = 0
+        time = 1
+        for _ in range(raws):
+            data = f.readline()  # data contains the feature and label
+            if num == 15000000:
+                num = 0
+                time += 1
+            if data:
+                with open('../out/' + str(time) + '.csv', 'ab') as file:
+                    file.write(bytes(data, encoding='utf8'))
+                    num += 1
+            else:
+                break
+
+
+split_csv()
