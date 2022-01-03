@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.utils.data as Data
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 import os
-
+import time
 from MyDataset import MyDataset, convert
 from MyScaler import scale
 from cnn_model import CNN
@@ -56,7 +56,7 @@ for _ in range(epochs):
     train_dataset.initial()
     train_iter = Data.DataLoader(dataset=train_dataset, batch_size=batch_size)
     for i, data in enumerate(train_iter):
-        print("正在进行第" + str(i) + '个batch')
+        print(time.asctime(time.localtime(time.time())) + "正在进行第" + str(i) + '个batch')
         data_x, data_y = convert(data)
         # model.train()
         _, outputs = cnn(data_x)
@@ -70,7 +70,6 @@ for _ in range(epochs):
         # 累加每个step的损失
         tot_loss += loss.data
         train_outputs = outputs.argmax(dim=1)
-
         train_pred.extend(train_outputs.detach().cpu().numpy())
         train_trues.extend(data_y.detach().cpu().numpy())
         # tot_acc += (outputs.argmax(dim=1) == train_label_batch).sum().item()
