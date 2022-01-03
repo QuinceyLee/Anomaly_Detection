@@ -9,10 +9,10 @@ import pandas as pd
 
 from utils.Logger import Logger
 
-data_path = "./new/44-1.log.labeled.csv"
-batch_size = 5
-n_raws = 12
-epoch = 3
+# data_path = "./new/44-1.log.labeled.csv"
+# batch_size = 5
+# n_raws = 12
+# epoch = 3
 
 
 # train_dataset = MyDataset(data_path, n_raws, shuffle=False)
@@ -53,22 +53,24 @@ epoch = 3
 # print('mean = ', np.mean(df))
 # print('std = ', np.std(df))
 
-def split_csv():
-    with open('../new/train.csv', 'r') as f:
+def split_csv(fold, file_name, s):
+    with open(fold + file_name, 'r') as f:
         raws = 300000000
         num = 0
         time = 1
         for _ in range(raws):
             data = f.readline()  # data contains the feature and label
-            if num == 15000000:
+            if num == 7500000:
                 num = 0
                 time += 1
             if data:
-                with open('../out/' + str(time) + '.csv', 'ab') as file:
+                with open(fold + s + '.' + str(time) + '.csv', 'ab') as file:
                     file.write(bytes(data, encoding='utf8'))
                     num += 1
             else:
                 break
 
 
-split_csv()
+if __name__ == '__main__':
+    folder, fold_name, se = sys.argv[1:4]
+    split_csv(folder, fold_name, se)

@@ -45,8 +45,25 @@ def cnn_train_once():
     loss_func = nn.CrossEntropyLoss()
     print("开始训练主循环")
     cnn.train()
-    train_file_name = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv',
-                       '10.csv', '11.csv', '12.csv', '13.csv', '14.csv', '15.csv', '16.csv', '17.csv', '18.csv']
+    train_file_name = [
+        '1.1.csv', '1.2.csv',
+        '2.1.csv', '2.2csv',
+        '3.1.csv', '3.2.csv',
+        '4.1.csv', '4.2.csv',
+        '5.1.csv', '5.2csv',
+        '6.1.csv', '6.2.csv',
+        '7.1.csv', '7.2.csv',
+        '8.1.csv', '8.2csv',
+        '9.1.csv', '9.2.csv',
+        '10.1.csv', '10.2.csv',
+        '11.1.csv', '11.2csv',
+        '12.1.csv', '12.2.csv',
+        '13.1.csv', '13.2.csv',
+        '14.1.csv', '14.2csv',
+        '15.1.csv', '15.2.csv',
+        '16.1.csv', '16.2.csv',
+        '17.1.csv', '17.2csv',
+        '18.1.csv', '18.2.csv' ]
     train_folder = '/root/test/Anomaly_Detection/train/'
     for number in range(epochs):
         tot_loss = 0.0
