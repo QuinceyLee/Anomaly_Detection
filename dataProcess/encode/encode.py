@@ -4,6 +4,9 @@ import os
 
 # from dataProcess.conn2csv import filed
 # from utils.find_file import find_all_file_csv
+from dataProcess.conn2csv import filed
+
+
 def find_all_file_csv(fold):
     for root, ds, fs in os.walk(fold):
         for f in fs:
@@ -535,11 +538,11 @@ def save_encode_dir(file_fold, out_fold):
 
 
 def merge(fold):
-    with open('../../test/test.csv', 'ab') as f:
+    with open('./total.csv', 'ab') as f:
         for item in find_all_file_csv(fold):
             f.write(open(fold + '/' + item, 'rb').read())
 
 
 # collect_sample('/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/csv/sta')
 # save_encode_dir(data_csv, '/Volumes/T7 Touch/毕设相关/安全检测/数据集/opt/encode_5')
-merge('/root/test/Anomaly_Detection/merge')
+merge('/Users/lee/PycharmProjects/total')

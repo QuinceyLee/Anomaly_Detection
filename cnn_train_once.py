@@ -19,21 +19,15 @@ from utils.Logger import Logger
 def cnn_train_once():
     epochs = 10
     batch_size = 10000
-    learning_rate = 0.001
+    learning_rate = 0.01
 
-    cpu_num = 8  # 这里设置成你想运行的CPU个数
+    cpu_num = 4  # 这里设置成你想运行的CPU个数
     os.environ['OMP_NUM_THREADS'] = str(cpu_num)
     os.environ['OPENBLAS_NUM_THREADS'] = str(cpu_num)
     os.environ['MKL_NUM_THREADS'] = str(cpu_num)
     os.environ['VECLIB_MAXIMUM_THREADS'] = str(cpu_num)
     os.environ['NUMEXPR_NUM_THREADS'] = str(cpu_num)
     torch.set_num_threads(cpu_num)
-
-    def find_all_file(fold):
-        for root, ds, fs in os.walk(fold):
-            for f in fs:
-                if not f.startswith('._'):
-                    yield f
 
     sys.stdout = Logger('./out/result.log', sys.stdout)
     sys.stderr = Logger('./out/result.log_file', sys.stderr)
@@ -46,28 +40,29 @@ def cnn_train_once():
     print("开始训练主循环")
     cnn.train()
     train_file_name = [
-        '1.1.csv', '1.2.csv',
-        '2.1.csv', '2.2csv',
-        '3.1.csv', '3.2.csv',
-        '4.1.csv', '4.2.csv',
-        '5.1.csv', '5.2csv',
-        '6.1.csv', '6.2.csv',
-        '7.1.csv', '7.2.csv',
-        '8.1.csv', '8.2csv',
-        '9.1.csv', '9.2.csv',
-        '10.1.csv', '10.2.csv',
-        '11.1.csv', '11.2csv',
-        '12.1.csv', '12.2.csv',
-        '13.1.csv', '13.2.csv',
-        '14.1.csv', '14.2csv',
-        '15.1.csv', '15.2.csv',
-        '16.1.csv', '16.2.csv',
-        '17.1.csv', '17.2csv',
-        '18.1.csv', '18.2.csv' ]
-    train_folder = '/root/test/Anomaly_Detection/train/'
+        '1.csv',
+        '24.csv',
+        '2.csv', '27.csv',
+        '5.csv', '28.csv',
+        '6.csv', '30.csv',
+        '7.csv', '31.csv',
+        '8.csv', '32.csv',
+        '9.csv', '35.csv',
+        '11.csv', '36.csv',
+        '13.csv', '38.csv',
+        '14.csv', '39.csv',
+        '15.csv', '41.csv',
+        '16.csv', '42.csv',
+        '17.csv', '43.csv',
+        '18.csv', '44.csv',
+        '20.csv', '22.csv',
+        '23.csv', '21.csv',
+        '10.csv', '19.csv',
+        '29.csv', '40.csv'
+    ]
+    train_folder = '/root/test/Anomaly_Detection/train_last/train/'
     for number in range(epochs):
         tot_loss = 0.0
-        tot_acc = 0.0
         train_pred = []
         train_trues = []
         shuffle(train_file_name)
@@ -82,7 +77,7 @@ def cnn_train_once():
             x_train, y_train = torch.FloatTensor(x_train).to(device), torch.LongTensor(y_train).to(device)
             x_train = torch.unsqueeze(x_train, dim=1)
             train_dataset = torch.utils.data.TensorDataset(x_train, y_train)
-            train_loader = Data.DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
+            train_loader = Data.DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=4, shuffle=True)
             for i, (train_data_batch, train_data_label) in enumerate(train_loader):
                 print(time.asctime(time.localtime(time.time())) + "正在进行文件" + file_name + "的第" + str(i) + '个batch')
                 # model.train()
@@ -122,51 +117,51 @@ def cnn_train_once():
     # dt_train = pd.read_csv('./new/train.csv', header=None)
     torch.save(cnn.state_dict(), './out/cnn.pkl')
 
-    del train_dataset
-    gc.collect()
-    # test
-    cnn = CNN()
-    cnn.load_state_dict(torch.load('./out/cnn.pkl'))
-    test_pred = []
-    test_trues = []
-    cnn.eval()
-    test_file_name = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv']
-    test_folder = '/root/test/Anomaly_Detection/test/'
-    with torch.no_grad():
-        for file_name in test_file_name:
-            dt_test = pd.read_csv(test_folder + file_name, header=None)
-            dt_test = scale(dt_test.values)
-            x_test = dt_test[:, :-1].astype(float)
-            add_zeros = np.zeros(len(x_test))
-            x_test = np.c_[x_test, add_zeros]
-            x_test = np.reshape(x_test, (len(x_test), 4, 4))
-            y_test = dt_test[:, -1].astype(int)
-            x_test, y_test = torch.FloatTensor(x_test), torch.LongTensor(y_test)
-            x_test = torch.unsqueeze(x_test, dim=1)
-            test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
-            test_loader = Data.DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8)
-            for i, (train_data_batch, test_data_label) in enumerate(test_loader):
-                _, test_outputs = cnn(train_data_batch)
-                test_outputs = test_outputs.argmax(dim=1)
-                test_pred.extend(test_outputs.detach().cpu().numpy())
-                test_trues.extend(test_data_label.detach().cpu().numpy())
-        sklearn_accuracy = accuracy_score(test_trues, test_pred)
-        sklearn_precision = precision_score(test_trues, test_pred, average='micro')
-        sklearn_recall = recall_score(test_trues, test_pred, average='micro')
-        sklearn_f1 = f1_score(test_trues, test_pred, average='micro')
-        print(classification_report(test_trues, test_pred))
-        conf_matrix = get_confusion_matrix(test_trues, test_pred)
-        print(conf_matrix)
-        plot_confusion_matrix(conf_matrix)
-        print("[sklearn_metrics] "
-              "accuracy:{:.4f} "
-              "precision:{:.4f}"
-              " recall:{:.4f} "
-              "f1:{:.4f}".format
-              (sklearn_accuracy,
-               sklearn_precision,
-               sklearn_recall,
-               sklearn_f1))
+    # del train_dataset
+    # gc.collect()
+    # # test
+    # cnn = CNN()
+    # cnn.load_state_dict(torch.load('./out/cnn.pkl'))
+    # test_pred = []
+    # test_trues = []
+    # cnn.eval()
+    # test_file_name = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv']
+    # test_folder = '/root/test/Anomaly_Detection/test/'
+    # with torch.no_grad():
+    #     for file_name in test_file_name:
+    #         dt_test = pd.read_csv(test_folder + file_name, header=None)
+    #         dt_test = scale(dt_test.values)
+    #         x_test = dt_test[:, :-1].astype(float)
+    #         add_zeros = np.zeros(len(x_test))
+    #         x_test = np.c_[x_test, add_zeros]
+    #         x_test = np.reshape(x_test, (len(x_test), 4, 4))
+    #         y_test = dt_test[:, -1].astype(int)
+    #         x_test, y_test = torch.FloatTensor(x_test), torch.LongTensor(y_test)
+    #         x_test = torch.unsqueeze(x_test, dim=1)
+    #         test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
+    #         test_loader = Data.DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8)
+    #         for i, (train_data_batch, test_data_label) in enumerate(test_loader):
+    #             _, test_outputs = cnn(train_data_batch)
+    #             test_outputs = test_outputs.argmax(dim=1)
+    #             test_pred.extend(test_outputs.detach().cpu().numpy())
+    #             test_trues.extend(test_data_label.detach().cpu().numpy())
+    #     sklearn_accuracy = accuracy_score(test_trues, test_pred)
+    #     sklearn_precision = precision_score(test_trues, test_pred, average='micro')
+    #     sklearn_recall = recall_score(test_trues, test_pred, average='micro')
+    #     sklearn_f1 = f1_score(test_trues, test_pred, average='micro')
+    #     print(classification_report(test_trues, test_pred))
+    #     conf_matrix = get_confusion_matrix(test_trues, test_pred)
+    #     print(conf_matrix)
+    #     plot_confusion_matrix(conf_matrix)
+    #     print("[sklearn_metrics] "
+    #           "accuracy:{:.4f} "
+    #           "precision:{:.4f}"
+    #           " recall:{:.4f} "
+    #           "f1:{:.4f}".format
+    #           (sklearn_accuracy,
+    #            sklearn_precision,
+    #            sklearn_recall,
+    #            sklearn_f1))
 
 
 if __name__ == '__main__':

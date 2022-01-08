@@ -52,10 +52,11 @@ class CNN(nn.Module):
             nn.LeakyReLU(),
         )
         self.fc1 = nn.Linear(30 * 3 * 3, 100)
-        self.softmax = nn.Softmax(dim=1)
+        self.leaky = nn.LeakyReLU()
 
         # 输出层
         self.output = nn.Linear(in_features=100, out_features=8)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -64,6 +65,6 @@ class CNN(nn.Module):
         x = self.conv4(x)
         x = x.view(x.size(0), -1)  # 保留batch
         x = self.fc1(x)
-        x = self.softmax(x)
+        x = self.leaky(x)
         output = self.output(x)  # 输出[8]
         return x, output

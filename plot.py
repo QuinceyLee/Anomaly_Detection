@@ -9,8 +9,8 @@ def plot_confusion_matrix(conf_matrix):
     plt.xticks(indices, labels)
     plt.yticks(indices, labels)
     plt.colorbar()
-    plt.xlabel('y_pred')
-    plt.ylabel('y_true')
+    plt.xlabel('y_true')
+    plt.ylabel('y_pred')
     # 显示数据
     for first_index in range(conf_matrix.shape[0]):
         for second_index in range(conf_matrix.shape[1]):
